@@ -29,6 +29,57 @@ Managing waste effectively is crucial for the well-being of our environment and 
 | **Image Recognition** | CNN (Convolutional Neural Network)      |
 | **Chatbot**       | Natural Language Processing (NLP)          |
 | **Mini-Game**     | Unity                                       |
+## Getting Started
+1. **Frontend Setup**: 
+   - Navigate to the frontend directory and run it on live server to start the frontend server.
+
+2. **Backend Setup**:
+   - Navigate to the backend directory and  set up the transformer and move chatbot.py in huggingface_interface and run `python chatbot.py` to start the Flask server to run the chatbot.
+3. **Transformer Setup**:  
+   - Please Follow the following instructions for cloning the transformer
+   ```bash
+   # Clone the github repository and navigate to the project directory.
+     git clone https://github.com/AI4Bharat/IndicTrans2
+     cd IndicTrans2
+     # Install all the dependencies and requirements associated with the project.
+     source install.sh
+   ```
+   - Inside IndicTrans2 clone the tokeniser using the instructions below  
+   ```bash 
+   git clone https://github.com/VarunGumma/IndicTransTokenizer
+   cd IndicTransTokenizer
+   pip install --editable ./
+   ```
+   - Now navigate to example.py in huggingface_interface in IndicTrans2 and please paste this code instead of the existing one 
+   ```python
+      import torch
+      from transformers import AutoModelForSeq2SeqLM
+      from IndicTransTokenizer import IndicProcessor, IndicTransTokenizer
+
+      tokenizer = IndicTransTokenizer(direction="en-indic")
+      ip = IndicProcessor(inference=True)
+      model = AutoModelForSeq2SeqLM.from_pretrained("ai4bharat/indictrans2-en-indic-dist-200M", trust_remote_code=True)
+
+      sentences = [
+          "This is a test sentence.",
+          "This is another longer different test sentence.",
+          "Please send an SMS to 9876543210 and an email on newemail123@xyz.com by 15th October, 2023.",
+      ]
+
+      batch = ip.preprocess_batch(sentences, src_lang="eng_Latn", tgt_lang="hin_Deva")
+      batch = tokenizer(batch, src=True, return_tensors="pt")
+
+      with torch.inference_mode():
+          outputs = model.generate(**batch, num_beams=5, num_return_sequences=1, max_length=256)
+
+      outputs = tokenizer.batch_decode(outputs, src=False)
+      outputs = ip.postprocess_batch(outputs, lang="hin_Deva")
+      print(outputs)
+    
+    ```
+
+Note: We recommend creating a virtual environment with python>=3.7.
+
 ## Challenges Faced
 
 1. **Limited Data Availability**: Dealing with diverse data sources required careful consideration to ensure accuracy.
