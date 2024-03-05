@@ -1,0 +1,4 @@
+.vscode
+DATASET
+waste classification.zip
+trained_model.h5
